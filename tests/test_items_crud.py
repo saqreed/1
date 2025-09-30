@@ -52,3 +52,15 @@ def test_root_page(client):
     r = client.get("/")
     assert r.status_code == 200
     assert r.data.decode("utf-8") == "Hello, World!"
+
+def test_internal_server_error(client):
+    app = client.application
+
+    def boom():
+        raise RuntimeError("boom")
+
+    app.add_url_rule("/boom", view_func=boom)
+    r = client.get("/boom")
+    assert r.status_code == 500
+    body = r.get_json()
+    assert body["error"] == "server_error"

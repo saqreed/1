@@ -20,7 +20,6 @@ def create_app() -> Flask:
     app.config.from_object(Config)
 
     # ---------- In-memory "DB" ----------
-    # Простое хранилище в памяти: id -> item
     ITEMS: Dict[str, Dict[str, Any]] = {}
 
     # ---------- Hooks & logging ----------
@@ -30,14 +29,12 @@ def create_app() -> Flask:
 
     @app.after_request
     def _add_common_headers(resp):
-        # простой корс и хедеры по дефолту
         resp.headers.setdefault("X-App-Name", app.config["APP_NAME"])
         resp.headers.setdefault("Cache-Control", "no-store")
         return resp
 
     @app.teardown_request
     def _log_request(exc):
-        # мини-лог: метод, путь, время
         try:
             dt = (datetime.now(timezone.utc) - g._ts).total_seconds()
             app.logger.info("%s %s -> %.3fs", request.method, request.path, dt)
@@ -73,7 +70,6 @@ def create_app() -> Flask:
     # ---------- Routes ----------
     @app.get("/")
     def hello():
-        # базовая страница для браузера
         return "Hello, World!"
 
     @app.get("/health")
@@ -96,7 +92,6 @@ def create_app() -> Flask:
     # ----- CRUD: /api/items -----
     @app.get("/api/items")
     def list_items():
-        # ?q= фильтр по подстроке
         q = request.args.get("q", "").lower()
         values = list(ITEMS.values())
         if q:
@@ -147,5 +142,4 @@ def create_app() -> Flask:
 app = create_app()
 
 if __name__ == "__main__":
-    # 127.0.0.1 чтобы не ловить проблемы прав на сокет
     app.run(host="127.0.0.1", port=5000, debug=True)
