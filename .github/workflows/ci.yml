@@ -21,10 +21,24 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; else pip install flask pytest; fi
-      
-      - name: Run tests
+          pip install -r requirements.txt
+      - name: Lint (flake8)
+        run: flake8 .
+
+      - name: Run tests with coverage
         env:
           PYTHONPATH: ${{ github.workspace }}
-        run: | 
-          pytest -q
+        run: pytest
+
+      - name: Save coverage report
+        if: always()
+        run: |
+          mkder -p artifacts
+          pytest --cov=app --cov-report=xml:artifacts/coverage.xml --cov-report=term
+        # загрузим артефакт (можно отркыть/скачать в UI)
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: artifacts
