@@ -13,11 +13,14 @@ def test_echo_malformed_json(client):
     assert body["error"] == "bad_request"
     assert "Malformed JSON" in body["message"]
 
+
 def test_delete_not_found(client):
     r = client.delete("/api/items/nope")
     assert r.status_code == 404
     assert r.get_json()["error"] == "not_found"
 
+
 def test_update_not_found(client):
     r = client.put("/api/items/nope", json={"name": "X"})
     assert r.status_code == 404
+    

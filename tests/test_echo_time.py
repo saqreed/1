@@ -5,10 +5,12 @@ def test_echo_ok(client):
     assert body["received"] == {"a": 1}
     assert body["count"] > 0
 
+
 def test_echo_requires_json(client):
     r = client.post("/api/echo", data="not json", headers={"Content-Type": "text/plain"})
     assert r.status_code == 400
     assert r.get_json()["error"] == "bad_request"
+
 
 def test_time_ok(client):
     r = client.get("/api/time")
