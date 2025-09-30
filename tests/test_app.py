@@ -1,17 +1,4 @@
-import pytest
-from app import create_app
-
-@pytest.fixture
-
-
-def client():
-    app = create_app()
-    app.config.update(TESTING=True)
-    with app.test_client() as client:
-        yield client
-
-
-def test_root_ok(client):
+def test_root_page(client):
     r = client.get("/")
     assert r.status_code == 200
     assert r.data.decode() == "Hello, World!"
@@ -23,5 +10,6 @@ def test_root_content_type(client):
 
 
 def test_not_found(client):
-    r = client.get("/not-found")
+    r = client.get("/no-such")
     assert r.status_code == 404
+    assert r.get_json()["error"] == "not_found"
