@@ -145,10 +145,7 @@ def create_app() -> Flask:
         resp.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
         return resp
 
-
     return app
-
-
 
 app = create_app()
 
