@@ -33,7 +33,7 @@ jobs:
       - name: Save coverage report
         if: always()
         run: |
-          mkder -p artifacts
+          mkdir -p artifacts
           pytest --cov=app --cov-report=xml:artifacts/coverage.xml --cov-report=term
         # загрузим артефакт (можно отркыть/скачать в UI)
       - name: Upload coverage artifact
