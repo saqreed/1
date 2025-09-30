@@ -30,6 +30,7 @@ def create_app() -> Flask:
     @app.after_request
     def _add_common_headers(resp):
         resp.headers.setdefault("X-App-Name", app.config["APP_NAME"])
+        resp.headers.setdefault("Access-Control-Allow-Origin", "*")
         resp.headers.setdefault("Cache-Control", "no-store")
         return resp
 
@@ -136,10 +137,22 @@ def create_app() -> Flask:
         del ITEMS[item_id]
         return "", 204
 
+    @app.options("/api/<path:_>")
+    def _cors_preflight(_):
+        resp = jsonify(ok=True)
+        resp.headers["Access-Control-Allow-Origin"] = "*"
+        resp.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+        resp.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
+        return resp
+
+
     return app
+
 
 
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    import os
+    port = int(os.getenv("PORT", "5000"))
+    app.run(host="0.0.0.0", port=port, debug=False)
